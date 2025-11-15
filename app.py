@@ -1,53 +1,43 @@
 import streamlit as st
-import time
 import random
+import time
 
-st.title("🦖 미니 공룡 점프 게임!")
-
-# 초기화
-if "x" not in st.session_state:
-    st.session_state.x = 30  # 선인장 위치
-    st.session_state.y = 0   # 공룡 높이
-    st.session_state.jump = False
-    st.session_state.score = 0
+# 게임 상태 초기화
+if "game_over" not in st.session_state:
     st.session_state.game_over = False
+    st.session_state.score = 0
+    st.session_state.dinosaur_pos = 0  # 0은 낮음, 1은 점프 중
+    st.session_state.cactus_pos = 30  # 선인장의 위치
+
+# 제목
+st.title("🦖 미니 공룡 점프 게임!")
 
 # 점프 버튼
 if st.button("점프! 🚀") and not st.session_state.game_over:
-    if st.session_state.y == 0:
-        st.session_state.jump = True
+    if st.session_state.dinosaur_pos == 0:
+        st.session_state.dinosaur_pos = 1  # 점프 상태로 변경
 
-# 게임 루프
-placeholder = st.empty()
-
-while not st.session_state.game_over:
-    # 점프 처리
-    if st.session_state.jump:
-        st.session_state.y = 1
-        st.session_state.jump = False
-    else:
-        st.session_state.y = 0
-
+# 게임 루프 (각 프레임을 매번 갱신)
+if not st.session_state.game_over:
     # 선인장 이동
-    st.session_state.x -= 1
-    if st.session_state.x < 0:
-        st.session_state.x = 30
+    st.session_state.cactus_pos -= 1
+    if st.session_state.cactus_pos < 0:
+        st.session_state.cactus_pos = 30
         st.session_state.score += 1
 
+    # 점프 상태 되돌리기 (시간 지나면)
+    if st.session_state.dinosaur_pos == 1:
+        time.sleep(0.2)
+        st.session_state.dinosaur_pos = 0  # 점프 후 다시 낮아짐
+
     # 충돌 체크
-    if st.session_state.x == 5 and st.session_state.y == 0:
-        st.session_state.game_over = True
+    if st.session_state.cactus_pos == 5 and st.session_state.dinosaur_pos == 0:
+        st.session_state.game_over = True  # 충돌하면 게임 오버
 
-    # 화면 출력
-    scene = [" "] * 40
-    scene[5] = "🐶" if st.session_state.y == 0 else "🐶⬆️"
-    scene[st.session_state.x] = "🌵"
-
-    placeholder.write("".join(scene))
-    placeholder.write(f"점수: {st.session_state.score}")
-
-    time.sleep(0.05)
-
-if st.session_state.game_over:
-    st.error("게임 오버! 😭 다시 실행하면 재시작됩니다.")
+    # 화면 그리기
+    scene = [" "] * 40  # 화면 크기 40칸
+    scene[5] = "🐶" if st.session_state.dinosaur_pos == 0 else "🐶⬆️"  # 공룡
+    scene[st.session_state.cactus_pos] = "🌵"  # 선인장
+    st.write("".join(scene))
+    st.write(f"점수: {
 
