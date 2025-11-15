@@ -1,31 +1,28 @@
 import streamlit as st
-from streamlit_drawable_canvas import st_canvas
+import random
 
-st.title("🎨 낙서 게임 – 실시간 그림판")
+st.title("🎲 운명의 버튼 게임")
 
-st.write("마우스로 아무거나 그려보세요 😎")
+# 점수 초기화
+if "score" not in st.session_state:
+    st.session_state.score = 0
 
-# 캔버스
-canvas = st_canvas(
-    fill_color="rgba(255, 165, 0, 0.2)",  
-    stroke_width=5,
-    stroke_color="#000000",
-    background_color="#ffffff",
-    height=400,
-    width=600,
-    drawing_mode="freedraw",
-    key="canvas",
-)
+st.write(f"현재 점수: {st.session_state.score}")
 
-# 그린 그림 표시
-if canvas.image_data is not None:
-    st.image(canvas.image_data, caption="당신의 작품 🎉")
+# 버튼 클릭 이벤트
+if st.button("누르기!"):
+    event = random.choice(["point", "bomb", "money", "nothing"])
+    
+    if event == "point":
+        st.session_state.score += 10
+        st.success("🎉 점수 10점 획득!")
+    elif event == "bomb":
+        st.session_state.score = max(0, st.session_state.score - 20)
+        st.error("💣 폭탄! 점수 20점 차감!")
+    elif event == "money":
+        st.session_state.score += 50
+        st.success("💰 돈 획득! 점수 50점 추가!")
+    else:
+        st.info("😱 아무 일도 일어나지 않았습니다...")
 
-# 다운 버튼
-if canvas.image_data is not None:
-    st.download_button(
-        "그림 다운로드",
-        canvas.image_data.tobytes(),
-        file_name="my_drawing.png",
-        mime="image/png"
-    )
+st.write("버튼을 눌러 운명을 확인하세요!")
