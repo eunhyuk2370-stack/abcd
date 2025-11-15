@@ -1,39 +1,31 @@
 import streamlit as st
-import random
+from streamlit_drawable_canvas import st_canvas
 
-# 퀴즈 데이터 (이미지 대신 텍스트로 예시)
-quiz_data = [
-    {"question": "이 동물은 무엇인가요?", "image": "https://via.placeholder.com/150/FF0000/FFFFFF?text=Cat", "answer": "고양이"},
-    {"question": "이 동물은 무엇인가요?", "image": "https://via.placeholder.com/150/00FF00/FFFFFF?text=Dog", "answer": "강아지"},
-    {"question": "이 동물은 무엇인가요?", "image": "https://via.placeholder.com/150/0000FF/FFFFFF?text=Elephant", "answer": "코끼리"},
-    {"question": "이 동물은 무엇인가요?", "image": "https://via.placeholder.com/150/FFFF00/FFFFFF?text=Lion", "answer": "사자"}
-]
+st.title("🎨 낙서 게임 – 실시간 그림판")
 
-# 게임 초기화
-if "score" not in st.session_state:
-    st.session_state.score = 0
-    st.session_state.quiz_index = random.randint(0, len(quiz_data) - 1)  # 랜덤 퀴즈 선택
+st.write("마우스로 아무거나 그려보세요 😎")
 
-# 제목
-st.title("퀴즈 맞추기 게임! 🎮")
+# 캔버스
+canvas = st_canvas(
+    fill_color="rgba(255, 165, 0, 0.2)",  
+    stroke_width=5,
+    stroke_color="#000000",
+    background_color="#ffffff",
+    height=400,
+    width=600,
+    drawing_mode="freedraw",
+    key="canvas",
+)
 
-# 퀴즈 불러오기
-quiz = quiz_data[st.session_state.quiz_index]
+# 그린 그림 표시
+if canvas.image_data is not None:
+    st.image(canvas.image_data, caption="당신의 작품 🎉")
 
-# 퀴즈 질문과 이미지 표시
-st.image(quiz["image"])
-st.write(quiz["question"])
-
-# 답 입력란
-user_answer = st.text_input("정답을 입력하세요:")
-
-# 정답 확인 버튼
-if st.button("정답 확인"):
-    if user_answer.lower() == quiz["answer"].lower():
-        st.success(f"정답! 🎉")
-        st.session_state.score += 1
-        st.session_state.quiz_index = random.randint(0, len(quiz_data) - 1)  # 새로운 퀴즈로 변경
-        st.write(f"현재 점수: {st.session_state.score}")
-    else:
-        st.error(f"틀렸어요! 😢 다시 도전해 보세요.")
-        st.write(f"현재 점수: {st.session_state.score}")
+# 다운 버튼
+if canvas.image_data is not None:
+    st.download_button(
+        "그림 다운로드",
+        canvas.image_data.tobytes(),
+        file_name="my_drawing.png",
+        mime="image/png"
+    )
