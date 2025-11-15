@@ -43,3 +43,4 @@ if st.button("운명의 버튼 누르기!"):
     st.write(event["desc"])
     st.write(f"현재 점수: {st.session_state.score}")
     st.write(f"아이템: {', '.join(st.session_state.items) if st.session_state.items else '없음'}")
+
