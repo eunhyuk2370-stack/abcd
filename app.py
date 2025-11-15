@@ -1,25 +1,23 @@
 import streamlit as st
 import random
 
-st.title("⚡ 숫자 피하기 스피드 게임")
+st.title("🤣 무한 이상한 버튼")
 
-# 점수 초기화
-if "score" not in st.session_state:
-    st.session_state.score = 0
+if "responses" not in st.session_state:
+    st.session_state.responses = []
 
-# 랜덤 숫자 생성
-danger_num = random.randint(1, 20)
-st.write(f"⚠️ 위험 숫자: {danger_num}")
+funny_responses = [
+    "💥 오! 갑자기 치즈가 떨어짐!",
+    "🐙 문어가 등장했다!",
+    "🎩 모자가 날아감!",
+    "🍌 바나나 껍질에 미끄러짐!",
+    "👽 외계인 등장! 안녕?",
+    "🔥 방 안이 갑자기 뜨거워짐!"
+]
 
-# 플레이어 입력
-player_num = st.number_input("1~20 숫자를 입력하세요 (위험 숫자 피하기!)", min_value=1, max_value=20, step=1)
+if st.button("뭐가 일어날까?"):
+    response = random.choice(funny_responses)
+    st.session_state.responses.append(response)
 
-if st.button("입력"):
-    if player_num == danger_num:
-        st.session_state.score = max(0, st.session_state.score - 5)
-        st.error("💥 위험! 점수 5점 차감")
-    else:
-        st.session_state.score += 1
-        st.success("✅ 안전! 점수 +1")
-    
-    st.write(f"현재 점수: {st.session_state.score}")
+for r in st.session_state.responses:
+    st.write(r)
