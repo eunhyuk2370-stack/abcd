@@ -1,31 +1,53 @@
 import streamlit as st
+import time
 import random
 
-# 제목
-st.title("랜덤 숫자 맞추기 게임! 🎮")
+st.title("🦖 미니 공룡 점프 게임!")
 
-# 랜덤 숫자 설정 (1부터 100까지)
-if "number" not in st.session_state:
-    st.session_state.number = random.randint(1, 100)
-    st.session_state.attempts = 0
+# 초기화
+if "x" not in st.session_state:
+    st.session_state.x = 30  # 선인장 위치
+    st.session_state.y = 0   # 공룡 높이
+    st.session_state.jump = False
+    st.session_state.score = 0
+    st.session_state.game_over = False
 
-# 사용자가 입력할 숫자
-user_guess = st.number_input("1부터 100까지 숫자를 맞춰보세요!", min_value=1, max_value=100)
+# 점프 버튼
+if st.button("점프! 🚀") and not st.session_state.game_over:
+    if st.session_state.y == 0:
+        st.session_state.jump = True
 
-# 버튼 클릭 시
-if st.button("정답 확인"):
-    st.session_state.attempts += 1
-    
-    # 숫자 맞추기
-    if user_guess < st.session_state.number:
-        st.write("너무 낮아요! 더 높은 숫자를 시도해보세요.")
-    elif user_guess > st.session_state.number:
-        st.write("너무 높아요! 더 낮은 숫자를 시도해보세요.")
+# 게임 루프
+placeholder = st.empty()
+
+while not st.session_state.game_over:
+    # 점프 처리
+    if st.session_state.jump:
+        st.session_state.y = 1
+        st.session_state.jump = False
     else:
-        st.success(f"정답! 🎉 {st.session_state.number}를 {st.session_state.attempts}번 만에 맞췄어요!")
-        st.session_state.number = random.randint(1, 100)  # 새로운 숫자 설정
-        st.session_state.attempts = 0  # 시도 횟수 초기화
+        st.session_state.y = 0
 
-# 시도 횟수
-st.write(f"시도 횟수: {st.session_state.attempts}번")
+    # 선인장 이동
+    st.session_state.x -= 1
+    if st.session_state.x < 0:
+        st.session_state.x = 30
+        st.session_state.score += 1
+
+    # 충돌 체크
+    if st.session_state.x == 5 and st.session_state.y == 0:
+        st.session_state.game_over = True
+
+    # 화면 출력
+    scene = [" "] * 40
+    scene[5] = "🐶" if st.session_state.y == 0 else "🐶⬆️"
+    scene[st.session_state.x] = "🌵"
+
+    placeholder.write("".join(scene))
+    placeholder.write(f"점수: {st.session_state.score}")
+
+    time.sleep(0.05)
+
+if st.session_state.game_over:
+    st.error("게임 오버! 😭 다시 실행하면 재시작됩니다.")
 
