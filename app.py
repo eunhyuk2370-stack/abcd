@@ -1,43 +1,39 @@
 import streamlit as st
 import random
-import time
 
-# 게임 상태 초기화
-if "game_over" not in st.session_state:
-    st.session_state.game_over = False
+# 퀴즈 데이터 (이미지 대신 텍스트로 예시)
+quiz_data = [
+    {"question": "이 동물은 무엇인가요?", "image": "https://via.placeholder.com/150/FF0000/FFFFFF?text=Cat", "answer": "고양이"},
+    {"question": "이 동물은 무엇인가요?", "image": "https://via.placeholder.com/150/00FF00/FFFFFF?text=Dog", "answer": "강아지"},
+    {"question": "이 동물은 무엇인가요?", "image": "https://via.placeholder.com/150/0000FF/FFFFFF?text=Elephant", "answer": "코끼리"},
+    {"question": "이 동물은 무엇인가요?", "image": "https://via.placeholder.com/150/FFFF00/FFFFFF?text=Lion", "answer": "사자"}
+]
+
+# 게임 초기화
+if "score" not in st.session_state:
     st.session_state.score = 0
-    st.session_state.dinosaur_pos = 0  # 0은 낮음, 1은 점프 중
-    st.session_state.cactus_pos = 30  # 선인장의 위치
+    st.session_state.quiz_index = random.randint(0, len(quiz_data) - 1)  # 랜덤 퀴즈 선택
 
 # 제목
-st.title("🦖 미니 공룡 점프 게임!")
+st.title("퀴즈 맞추기 게임! 🎮")
 
-# 점프 버튼
-if st.button("점프! 🚀") and not st.session_state.game_over:
-    if st.session_state.dinosaur_pos == 0:
-        st.session_state.dinosaur_pos = 1  # 점프 상태로 변경
+# 퀴즈 불러오기
+quiz = quiz_data[st.session_state.quiz_index]
 
-# 게임 루프 (각 프레임을 매번 갱신)
-if not st.session_state.game_over:
-    # 선인장 이동
-    st.session_state.cactus_pos -= 1
-    if st.session_state.cactus_pos < 0:
-        st.session_state.cactus_pos = 30
+# 퀴즈 질문과 이미지 표시
+st.image(quiz["image"])
+st.write(quiz["question"])
+
+# 답 입력란
+user_answer = st.text_input("정답을 입력하세요:")
+
+# 정답 확인 버튼
+if st.button("정답 확인"):
+    if user_answer.lower() == quiz["answer"].lower():
+        st.success(f"정답! 🎉")
         st.session_state.score += 1
-
-    # 점프 상태 되돌리기 (시간 지나면)
-    if st.session_state.dinosaur_pos == 1:
-        time.sleep(0.2)
-        st.session_state.dinosaur_pos = 0  # 점프 후 다시 낮아짐
-
-    # 충돌 체크
-    if st.session_state.cactus_pos == 5 and st.session_state.dinosaur_pos == 0:
-        st.session_state.game_over = True  # 충돌하면 게임 오버
-
-    # 화면 그리기
-    scene = [" "] * 40  # 화면 크기 40칸
-    scene[5] = "🐶" if st.session_state.dinosaur_pos == 0 else "🐶⬆️"  # 공룡
-    scene[st.session_state.cactus_pos] = "🌵"  # 선인장
-    st.write("".join(scene))
-    st.write(f"점수: {
-
+        st.session_state.quiz_index = random.randint(0, len(quiz_data) - 1)  # 새로운 퀴즈로 변경
+        st.write(f"현재 점수: {st.session_state.score}")
+    else:
+        st.error(f"틀렸어요! 😢 다시 도전해 보세요.")
+        st.write(f"현재 점수: {st.session_state.score}")
